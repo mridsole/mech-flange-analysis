@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+import numpy as np
+import click
+import IPython
+from scipy import spatial
+import matplotlib.pyplot as plt
+
+@click.command()
+@click.option(
+    '--side-1',
+    required=True,
+    help='CSV filename for the first flange displacement.'
+)
+@click.option(
+    '--side-2',
+    required=True,
+    help='CSV filename for the second flange displacement.'
+)
+def flange_analysis(side_1, side_2):
+
+    # Read the two CSV files. [:, 0] is displacement, [:, [1,2,3]] is x, y, z.
+    side_1 = np.loadtxt(side_1, skiprows=8, usecols=(1, 2, 3, 4), delimiter="  ,")
+    side_2 = np.loadtxt(side_2, skiprows=8, usecols=(1, 2, 3, 4), delimiter="  ,")
+
+    print(side_2)
+
+    xyz_1 = side_1[:, [1,2,3]]
+    xyz_2 = side_2[:, [1,2,3]]
+
+    # Build up a KDTree for xyz_2, to find the closest point to the _first_
+    # point in xyz_1.
+    kd_2 = spatial.KDTree(xyz_2)
+
+    # Query for closest point.
+    closest_i = kd_2.query(xyz_1[0,:])[1]
+
+    # Roll side_2 by that much.
+    side_2 = np.roll(side_2, -closest_i, axis=0)
+
+    # Plot the resulting thing
+    plt.plot(np.abs(side_1[:,0]))
+    plt.plot(np.abs(side_2[:,0]))
+    plt.plot(np.abs(side_1[:,0] + side_2[:,0]))
+    plt.show()
+
+    IPython.embed()
+
+
+if __name__ == '__main__':
+    flange_analysis()
