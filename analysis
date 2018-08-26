@@ -23,7 +23,7 @@ def flange_analysis(side_1, side_2):
     side_1 = np.loadtxt(side_1, skiprows=8, usecols=(1, 2, 3, 4), delimiter="  ,")
     side_2 = np.loadtxt(side_2, skiprows=8, usecols=(1, 2, 3, 4), delimiter="  ,")
 
-    print(side_2)
+    print(side_1)
 
     xyz_1 = side_1[:, [1,2,3]]
     xyz_2 = side_2[:, [1,2,3]]
@@ -38,10 +38,13 @@ def flange_analysis(side_1, side_2):
     # Roll side_2 by that much.
     side_2 = np.roll(side_2, -closest_i, axis=0)
 
+    # Flip as well ... lol
+    side_2 = np.flip(side_2, axis=0)
+
     # Plot the resulting thing
-    plt.plot(np.abs(side_1[:,0]))
-    plt.plot(np.abs(side_2[:,0]))
-    plt.plot(np.abs(side_1[:,0] + side_2[:,0]))
+    # plt.plot(np.abs(side_1[:,0]))
+    # plt.plot(np.abs(side_2[:,0]))
+    plt.plot(np.abs(side_1[:,0] - side_2[:,0]))
     plt.show()
 
     IPython.embed()
